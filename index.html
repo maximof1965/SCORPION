@@ -26,6 +26,7 @@
         }
         
         /* Contenedor de fondo con imagen - Resolución original sin pérdida de calidad */
+        /* Compatible con GitHub Pages - usa ruta relativa desde assets/ */
         body::before {
             content: '';
             position: fixed;
@@ -34,14 +35,19 @@
             width: 100vw;
             height: 100vh;
             z-index: 0;
-            background-image: url('SCORPIONPLATEADO.jpg');
+            /* Ruta relativa compatible con GitHub Pages */
+            /* Para usar WEBP, reemplaza la siguiente línea por: url('assets/scorpion.webp') */
+            background-image: url('assets/SCORPIONPLATEADO.jpg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            image-rendering: auto;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
             -webkit-backface-visibility: hidden;
             backface-visibility: hidden;
+            transform: translateZ(0);
+            will-change: transform;
         }
         
         /* Contenedor principal del contenido */
@@ -2540,5 +2546,4 @@
     </script>
 </body>
 </html>
-
 
