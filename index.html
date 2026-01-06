@@ -1045,6 +1045,18 @@
     <script>
         // URL de producción
         const N8N_WEBHOOK_URL = "https://n8n.srv1191353.hstgr.cloud/webhook/c3ca19cc-d4e2-4174-92e7-592bb84bdfd0";
+        // URL de espera webhook para BUSCAR y CAJA (BASE y CIERRE)
+        const N8N_WEBHOOK_URL_ESPERA = "https://n8n.srv1191353.hstgr.cloud/webhook/esperawebhook";
+        
+        // Función helper para determinar qué URL usar según el tipo de operación
+        function obtenerUrlWebhook(tipo) {
+            // BUSCAR y CAJA (BASE y CIERRE) usan la URL de espera
+            if (tipo === 'busqueda' || tipo === 'caja_base' || tipo === 'caja_cierre') {
+                return N8N_WEBHOOK_URL_ESPERA;
+            }
+            // Todas las demás operaciones usan la URL de producción
+            return N8N_WEBHOOK_URL;
+        }
         
         // Estado de la aplicación
         let estado = {
@@ -2191,7 +2203,10 @@
                 // BUSCAR usa enviarBusquedaInicial y ya espera respuesta
                 const necesitaRespuesta = tipo === 'caja_cierre';
                 
-                const response = await fetch(`${N8N_WEBHOOK_URL}?${params}`, {
+                // Usar la URL apropiada según el tipo de operación
+                const urlWebhook = obtenerUrlWebhook(tipo);
+                
+                const response = await fetch(`${urlWebhook}?${params}`, {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json'
@@ -2245,7 +2260,11 @@
                 
                 const datosMayusculas = convertirAMayusculas(datos);
                 const params = new URLSearchParams(datosMayusculas);
-                const response = await fetch(`${N8N_WEBHOOK_URL}?${params}`, {
+                
+                // BUSCAR usa la URL de espera webhook
+                const urlWebhook = obtenerUrlWebhook('busqueda');
+                
+                const response = await fetch(`${urlWebhook}?${params}`, {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json'
