@@ -1036,7 +1036,7 @@
         <div id="mensaje-exito" class="hidden success-message">
             <h2>✅ ENVIADO EXITOSAMENTE</h2>
             <p>Los datos se han enviado correctamente a n8n</p>
-            <button class="btn btn-primary" onclick="volverAInicio()" style="margin-top: 15px;">Inicio</button>
+            <p style="margin-top: 15px; font-size: 14px; color: #666;">Regresando a inicio automáticamente...</p>
         </div>
         
         <div id="mensaje-error" class="hidden error-message"></div>
@@ -1357,34 +1357,15 @@
                 validarFormularioControl(subtipo);
             });
             
-            // Detectar si es móvil
-            const esMovil = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
-                           (window.innerWidth <= 768);
-            
-            // Configurar Enter para enviar en el último campo (móvil)
-            if (esMovil) {
-                input.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter' || e.keyCode === 13) {
-                        e.preventDefault();
-                        // Verificar si este es el último campo
-                        const todosInputs = container.querySelectorAll('input[type="tel"]');
-                        const esUltimo = input === todosInputs[todosInputs.length - 1];
-                        
-                        if (esUltimo) {
-                            const subtipo = containerId.includes('envios') ? 'ENVIOS' : 'DEVOLUCIONES';
-                            const btnId = subtipo === 'ENVIOS' ? 'btn-enviar-control-envios' : 'btn-enviar-control-devoluciones';
-                            const btnEnviar = document.getElementById(btnId);
-                            
-                            if (btnEnviar && !btnEnviar.disabled) {
-                                enviarControl(subtipo);
-                            }
-                        } else {
-                            // Si no es el último, agregar nuevo campo
-                            agregarCampoNumero(containerId);
-                        }
-                    }
-                });
-            }
+            // Configurar Enter para CONTROL: siempre agregar nuevo campo (nunca enviar automáticamente)
+            // En CONTROL, Enter solo agrega campos, el usuario debe hacer click en "Enviar" para enviar
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.keyCode === 13) {
+                    e.preventDefault();
+                    // En CONTROL, Enter siempre agrega un nuevo campo (como si presionara el botón +)
+                    agregarCampoNumero(containerId);
+                }
+            });
             
             const btnAdd = document.createElement('button');
             btnAdd.type = 'button';
@@ -1510,6 +1491,24 @@
             document.getElementById('busqueda-inicial-cedula').value = '';
             document.getElementById('btn-buscar-inicial').disabled = false;
             mostrarPantalla('form-busqueda-inicial');
+            
+            // Configurar Enter en campo CEDULA para enviar búsqueda automáticamente
+            setTimeout(() => {
+                const campoCedula = document.getElementById('busqueda-inicial-cedula');
+                if (campoCedula) {
+                    // Agregar event listener (si ya existe, no causará problemas porque preventDefault evita comportamiento duplicado)
+                    campoCedula.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter' || e.keyCode === 13) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const btnBuscar = document.getElementById('btn-buscar-inicial');
+                            if (btnBuscar && !btnBuscar.disabled) {
+                                enviarBusquedaInicial();
+                            }
+                        }
+                    });
+                }
+            }, 100);
         }
         
         // Limpiar formulario
@@ -2591,6 +2590,10 @@
         // Mensajes
         function mostrarMensajeExito() {
             mostrarPantalla('mensaje-exito');
+            // Regresar automáticamente a inicio después de 2 segundos
+            setTimeout(() => {
+                volverAInicio();
+            }, 2000);
         }
         
         function mostrarError(mensaje) {
