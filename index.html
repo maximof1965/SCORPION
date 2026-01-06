@@ -1251,6 +1251,13 @@
             if (container) container.innerHTML = '';
             if (botonesEnviar) botonesEnviar.style.display = 'block';
             if (botonesInfo) botonesInfo.style.display = 'block';
+            
+            // Asegurar que el botón de enviar esté habilitado (CAJA CIERRE no requiere campos de entrada)
+            const btnEnviar = document.getElementById('btn-enviar-caja_cierre');
+            if (btnEnviar) {
+                btnEnviar.disabled = false;
+                btnEnviar.textContent = 'Enviar';
+            }
         }
         
         // Volver a turno CAJA BASE
@@ -1943,6 +1950,15 @@
             }
         }
         
+        // Configurar validaciones para CAJA CIERRE (no requiere validación, solo habilitar botón)
+        function configurarValidacionesCajaCierre() {
+            // CAJA CIERRE no tiene campos de entrada, el botón siempre debe estar habilitado
+            const btnEnviar = document.getElementById('btn-enviar-caja_cierre');
+            if (btnEnviar) {
+                btnEnviar.disabled = false;
+            }
+        }
+        
         function validarFormularioCajaBase() {
             const valor = document.getElementById('caja_base-valor').value.trim();
             const valido = validarNumero5Digitos1Decimal(valor);
@@ -2075,14 +2091,14 @@
                 "TURNO": estado.turno || ""
             };
             
-            // Solo agregar identificador si es requerido
-            if (requiereIdentificador) {
-                datos.identificador = estado.identificador || '';
-            }
-            
             // El tipo se establece en el switch según el caso
             if (tipo !== 'bar' && tipo !== 'guardadero' && tipo !== 'caja_base' && tipo !== 'caja_cierre') {
                 datos.tipo = tipo;
+            }
+            
+            // Establecer identificador para operaciones que lo requieren (excepto INGRESO que se maneja en su case)
+            if (requiereIdentificador && tipo !== 'ingreso') {
+                datos.identificador = estado.identificador || '';
             }
             
             switch(tipo) {
@@ -2090,6 +2106,17 @@
                     const descripcion = document.getElementById('ingreso-descripcion').value.trim();
                     // Obtener número del campo (puede venir del identificador o del campo editable)
                     const numeroIngreso = document.getElementById('ingreso-numero').value.trim();
+                    // Asegurar que el identificador siempre tenga un valor
+                    // Prioridad: numeroIngreso del campo > estado.identificador
+                    // El identificador es OBLIGATORIO para INGRESO
+                    if (numeroIngreso) {
+                        datos.identificador = numeroIngreso;
+                    } else if (estado.identificador) {
+                        datos.identificador = estado.identificador;
+                    } else {
+                        // Si no hay identificador, usar cadena vacía (será validado antes de enviar)
+                        datos.identificador = '';
+                    }
                     datos["VALOR (ING) "] = document.getElementById('ingreso-valor').value.trim();
                     datos["V RETIRO(ING) "] = document.getElementById('ingreso-v_retiro').value.trim();
                     datos["NOMBRE COMPLETO(ING) "] = document.getElementById('ingreso-nombre_completo').value.trim();
@@ -2097,10 +2124,6 @@
                     datos["ART(ING)"] = document.querySelector('input[name="ingreso-art"]:checked')?.value || '';
                     datos["DESCRIPCION"] = descripcion || 'nulo';
                     datos["LLEVAR"] = document.getElementById('ingreso-llevar').checked ? 'NO LLEVAR' : '';
-                    // Si hay número en el campo, usarlo como identificador
-                    if (numeroIngreso) {
-                        datos.identificador = numeroIngreso;
-                    }
                     break;
                     
                 case 'abono':
@@ -2197,6 +2220,18 @@
             
             try {
                 const datos = obtenerDatosFormulario(tipo);
+                
+                // Validar que los datos requeridos no estén vacíos antes de enviar
+                // Especialmente para INGRESO, asegurar que identificador tenga valor
+                if (tipo === 'ingreso' && (!datos.identificador || datos.identificador.trim() === '')) {
+                    mostrarError('ERROR: El identificador es requerido para INGRESO.\n\nPor favor ingrese un número identificador válido.');
+                    if (btnEnviar) {
+                        btnEnviar.disabled = false;
+                        btnEnviar.textContent = 'Enviar';
+                    }
+                    return;
+                }
+                
                 const params = new URLSearchParams(datos);
                 
                 // Solo CAJA CIERRE necesita esperar respuesta completa (necesita los datos)
@@ -2214,19 +2249,52 @@
                 });
                 
                 if (response.ok) {
-                    if (necesitaRespuesta) {
-                        // Para CAJA CIERRE: esperar respuesta completa para mostrar resultados
+                    // Siempre leer la respuesta completa para que n8n reconozca el nodo "Respond to Webhook"
+                    // Esto evita el error "Unused Respond to Webhook node found in the workflow"
+                    try {
+                        // Intentar leer como JSON primero
                         const respuesta = await response.json();
-                        mostrarResultadosCierre(respuesta);
-                    } else {
-                        // Para todas las demás operaciones: mostrar éxito inmediatamente
-                        // sin esperar el body de la respuesta (el request se envió exitosamente)
-                        mostrarMensajeExito();
+                        if (necesitaRespuesta) {
+                            // Para CAJA CIERRE: usar los datos de la respuesta para mostrar resultados
+                            mostrarResultadosCierre(respuesta);
+                        } else {
+                            // Para todas las demás operaciones: mostrar éxito (los datos se enviaron correctamente)
+                            mostrarMensajeExito();
+                        }
+                    } catch (jsonError) {
+                        // Si no es JSON, leer como texto para consumir la respuesta
+                        // Esto es necesario para que n8n reconozca que se usó el nodo "Respond to Webhook"
+                        try {
+                            await response.text();
+                        } catch (textError) {
+                            // Si no se puede leer, continuar de todas formas
+                        }
+                        
+                        if (necesitaRespuesta) {
+                            // Si necesitábamos la respuesta pero no es JSON válido, mostrar error
+                            mostrarError('La respuesta del servidor no está en formato JSON válido.');
+                            if (btnEnviar) {
+                                btnEnviar.disabled = false;
+                                btnEnviar.textContent = 'Enviar';
+                            }
+                        } else {
+                            // Para operaciones normales, mostrar éxito aunque la respuesta no sea JSON
+                            // Lo importante es que se leyó la respuesta para que n8n no se queje
+                            mostrarMensajeExito();
+                        }
                     }
                 } else {
                     // Si hay error, leer el mensaje de error
-                    const errorText = await response.text();
-                    mostrarError(`ENVÍO DE INFORMACIÓN FALLIDA\n\nError del servidor: ${response.status}\n${errorText.substring(0, 200)}\n\nPor favor vuelva a intentar enviar los datos.`);
+                    let errorText = '';
+                    try {
+                        errorText = await response.text();
+                    } catch (e) {
+                        errorText = 'No se pudo leer el mensaje de error del servidor';
+                    }
+                    
+                    // Mostrar error más detallado
+                    const errorMessage = `ENVÍO DE INFORMACIÓN FALLIDA\n\nError del servidor: ${response.status} ${response.statusText}\n\n${errorText.substring(0, 500)}\n\nPor favor verifique:\n- Que todos los campos requeridos estén completos\n- Que los datos sean válidos\n- Su conexión a internet\n\nVuelva a intentar enviar los datos.`;
+                    mostrarError(errorMessage);
                     if (btnEnviar) {
                         btnEnviar.disabled = false;
                         btnEnviar.textContent = 'Enviar';
@@ -2272,11 +2340,30 @@
                 });
                 
                 if (response.ok) {
-                    const respuesta = await response.json();
-                    mostrarResultadosBusqueda(respuesta);
+                    // Leer la respuesta completa para que n8n reconozca el nodo "Respond to Webhook"
+                    try {
+                        const respuesta = await response.json();
+                        mostrarResultadosBusqueda(respuesta);
+                    } catch (jsonError) {
+                        // Si no es JSON, intentar leer como texto
+                        try {
+                            const textoRespuesta = await response.text();
+                            mostrarError(`BÚSQUEDA FALLIDA\n\nLa respuesta del servidor no está en formato JSON válido.\nRespuesta: ${textoRespuesta.substring(0, 200)}\n\nPor favor vuelva a intentar.`);
+                        } catch (textError) {
+                            mostrarError(`BÚSQUEDA FALLIDA\n\nNo se pudo leer la respuesta del servidor.\n\nPor favor vuelva a intentar.`);
+                        }
+                        btnBuscar.disabled = false;
+                        btnBuscar.textContent = 'Buscar';
+                    }
                 } else {
-                    const errorText = await response.text();
-                    mostrarError(`BÚSQUEDA FALLIDA\n\nError: ${errorText.substring(0, 200)}\n\nPor favor vuelva a intentar.`);
+                    // Si hay error, leer el mensaje de error
+                    let errorText = '';
+                    try {
+                        errorText = await response.text();
+                    } catch (e) {
+                        errorText = 'No se pudo leer el mensaje de error del servidor';
+                    }
+                    mostrarError(`BÚSQUEDA FALLIDA\n\nError del servidor: ${response.status} ${response.statusText}\n\n${errorText.substring(0, 500)}\n\nPor favor vuelva a intentar.`);
                     btnBuscar.disabled = false;
                     btnBuscar.textContent = 'Buscar';
                 }
