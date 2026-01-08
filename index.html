@@ -518,6 +518,7 @@
                 <button class="btn btn-secondary" onclick="mostrarTurnoGuardadero()" style="width: 200px;">GUARDADERO</button>
                 <button class="btn btn-secondary" onclick="mostrarCajaBaseCierre()" style="width: 200px;">CAJA</button>
                 <button class="btn btn-secondary" onclick="mostrarControl()" style="width: 200px;">CONTROL</button>
+                <button class="btn btn-secondary" onclick="mostrarTurnoGastos()" style="width: 200px;">GASTOS</button>
             </div>
         </div>
         
@@ -565,6 +566,7 @@
                 <button class="btn-operation" onclick="mostrarFormulario('aumento')">AUMENTO</button>
                 <button class="btn-operation" onclick="mostrarFormulario('ventas')">VENTAS</button>
                 <button class="btn-operation" onclick="mostrarFormulario('devolucion')">DEVOLUCION</button>
+                <button class="btn-operation" onclick="mostrarFormulario('gastos')">GASTOS</button>
             </div>
             <div class="center" style="margin-top: 20px;">
                 <button class="btn btn-back" onclick="volverAOperaciones()">← Atrás</button>
@@ -822,6 +824,20 @@
             </div>
         </div>
         
+        <!-- Selección de Turno para GASTOS -->
+        <div id="screen-turno-gastos" class="hidden">
+            <h1>SCORPION - GASTOS</h1>
+            <div class="subtitle center">Seleccione Turno:</div>
+            <div class="center">
+                <button class="btn btn-turno" onclick="seleccionarTurnoGastos('1')">TURNO 1</button>
+                <button class="btn btn-turno" onclick="seleccionarTurnoGastos('2')">TURNO 2</button>
+                <button class="btn btn-turno" onclick="seleccionarTurnoGastos('3')">TURNO 3</button>
+            </div>
+            <div class="center" style="margin-top: 20px;">
+                <button class="btn btn-back" onclick="volverAInicio()">VOLVER A INICIO</button>
+            </div>
+        </div>
+        
         <!-- Selección BASE/CIERRE para CAJA -->
         <div id="screen-caja-base-cierre" class="hidden">
             <h1>SCORPION - CAJA</h1>
@@ -890,6 +906,24 @@
             <div class="center">
                 <button class="btn btn-back" onclick="mostrarTurnoGuardadero()">← Atrás</button>
                 <button class="btn btn-primary" id="btn-enviar-guardadero" onclick="enviarDatos('guardadero')" disabled>Enviar</button>
+            </div>
+        </div>
+        
+        <!-- Formulario GASTOS -->
+        <div id="form-gastos" class="hidden">
+            <h1>GASTOS</h1>
+            <div class="subtitle">Turno: <span id="gastos-turno"></span></div>
+            <div class="form-group">
+                <label>VALOR *</label>
+                <input type="text" id="gastos-valor" placeholder="1-3 dígitos (ej: 1, 2.5, 100)" inputmode="decimal">
+            </div>
+            <div class="form-group">
+                <label>DESCRIPCION *</label>
+                <input type="text" id="gastos-descripcion" placeholder="Descripción del gasto" pattern="[A-Za-záéíóúÁÉÍÓÚñÑ0-9 ]+" inputmode="text">
+            </div>
+            <div class="center">
+                <button class="btn btn-back" onclick="mostrarTurnoGastos()">← Atrás</button>
+                <button class="btn btn-primary" id="btn-enviar-gastos" onclick="enviarDatos('gastos')" disabled>Enviar</button>
             </div>
         </div>
         
@@ -1046,7 +1080,7 @@
     
     <script>
         // URL de producción
-        const N8N_WEBHOOK_URL = "https://n8n.srv1191353.hstgr.cloud/webhook/c3ca19cc-d4e2-4174-92e7-592bb84bdfd0";
+        const N8N_WEBHOOK_URL = "https://n8n.srv1191353.hstgr.cloud/webhook/INVENTARIO";
         // URL de espera webhook para BUSCAR y CAJA (BASE y CIERRE)
         const N8N_WEBHOOK_URL_ESPERA = "https://n8n.srv1191353.hstgr.cloud/webhook/esperawebhook";
         
@@ -1207,6 +1241,23 @@
             setTimeout(() => {
                 configurarValidacionesGuardadero();
                 document.getElementById('guardadero-valor').focus();
+            }, 10);
+        }
+        
+        // Mostrar turno para GASTOS
+        function mostrarTurnoGastos() {
+            estado.tipoOperacion = 'gastos';
+            mostrarPantalla('screen-turno-gastos');
+        }
+        
+        // Seleccionar turno para GASTOS
+        function seleccionarTurnoGastos(turno) {
+            estado.turno = turno;
+            mostrarPantalla('form-gastos');
+            document.getElementById('gastos-turno').textContent = turno;
+            setTimeout(() => {
+                configurarValidacionesGastos();
+                document.getElementById('gastos-valor').focus();
             }, 10);
         }
         
@@ -1568,7 +1619,7 @@
         // Mostrar formulario
         function mostrarFormulario(tipo) {
             // Limpiar TODOS los formularios primero para evitar datos residuales
-            ['ingreso', 'abono', 'pedir_sin_pagar', 'intereses', 'espera', 'busqueda', 'salida', 'aumento', 'ventas', 'devolucion', 'caja_base', 'caja_cierre', 'bar', 'guardadero'].forEach(form => {
+            ['ingreso', 'abono', 'pedir_sin_pagar', 'intereses', 'espera', 'busqueda', 'salida', 'aumento', 'ventas', 'devolucion', 'caja_base', 'caja_cierre', 'bar', 'guardadero', 'gastos'].forEach(form => {
                 limpiarFormulario(form);
             });
             
@@ -1621,6 +1672,8 @@
                     configurarValidacionesBar();
                 } else if (tipo === 'guardadero') {
                     configurarValidacionesGuardadero();
+                } else if (tipo === 'gastos') {
+                    configurarValidacionesGastos();
                 }
             }, 10);
         }
@@ -2001,6 +2054,37 @@
             document.getElementById('btn-enviar-guardadero').disabled = !valido;
         }
         
+        function configurarValidacionesGastos() {
+            const inputValor = document.getElementById('gastos-valor');
+            const inputDescripcion = document.getElementById('gastos-descripcion');
+            
+            if (inputValor) {
+                inputValor.addEventListener('input', function(e) {
+                    validarEntradaDecimal(e.target);
+                    validarFormularioGastos();
+                });
+            }
+            
+            if (inputDescripcion) {
+                inputDescripcion.addEventListener('input', function(e) {
+                    validarFormularioGastos();
+                });
+            }
+            
+            validarFormularioGastos();
+        }
+        
+        function validarFormularioGastos() {
+            const valor = document.getElementById('gastos-valor').value.trim();
+            const descripcion = document.getElementById('gastos-descripcion').value.trim();
+            
+            const valorValido = validarNumero1a3DigitosDecimal(valor);
+            const descripcionValida = descripcion.length > 0 && /^[A-Za-záéíóúÁÉÍÓÚñÑ0-9 ]+$/.test(descripcion);
+            
+            const valido = valorValido && descripcionValida;
+            document.getElementById('btn-enviar-gastos').disabled = !valido;
+        }
+        
         // Validar entrada en tiempo real para campos decimales (1-3 dígitos antes del punto)
         function validarEntradaDecimal(input) {
             let valor = input.value;
@@ -2085,8 +2169,8 @@
         
         // Obtener datos según formulario
         function obtenerDatosFormulario(tipo) {
-            // BAR, GUARDADERO, CAJA BASE y CAJA CIERRE no requieren identificador
-            const requiereIdentificador = tipo !== 'bar' && tipo !== 'guardadero' && tipo !== 'caja_base' && tipo !== 'caja_cierre';
+            // BAR, GUARDADERO, GASTOS, CAJA BASE y CAJA CIERRE no requieren identificador
+            const requiereIdentificador = tipo !== 'bar' && tipo !== 'guardadero' && tipo !== 'gastos' && tipo !== 'caja_base' && tipo !== 'caja_cierre';
             
             let datos = {
                 "Marca temporal": obtenerMarcaTemporal(),
@@ -2094,7 +2178,7 @@
             };
             
             // El tipo se establece en el switch según el caso
-            if (tipo !== 'bar' && tipo !== 'guardadero' && tipo !== 'caja_base' && tipo !== 'caja_cierre') {
+            if (tipo !== 'bar' && tipo !== 'guardadero' && tipo !== 'gastos' && tipo !== 'caja_base' && tipo !== 'caja_cierre') {
                 datos.tipo = tipo;
             }
             
@@ -2206,6 +2290,12 @@
                 case 'guardadero':
                     datos["tipo"] = 'GUARDADERO';
                     datos["VALOR"] = document.getElementById('guardadero-valor').value.trim();
+                    break;
+                    
+                case 'gastos':
+                    datos["tipo"] = 'GASTOS';
+                    datos["VALOR"] = document.getElementById('gastos-valor').value.trim();
+                    datos["DESCRIPCION"] = document.getElementById('gastos-descripcion').value.trim();
                     break;
             }
             
@@ -2771,6 +2861,11 @@
             // GUARDADERO - último campo: valor
             setTimeout(() => {
                 configurarEnterEnUltimoCampo('guardadero', 'guardadero-valor', 'btn-enviar-guardadero');
+            }, 100);
+            
+            // GASTOS - último campo: descripcion
+            setTimeout(() => {
+                configurarEnterEnUltimoCampo('gastos', 'gastos-descripcion', 'btn-enviar-gastos');
             }, 100);
             
             // SALIDA - último campo: descuento
