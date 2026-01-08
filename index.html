@@ -660,9 +660,9 @@
                 <div class="checkbox-group">
                     <input type="checkbox" id="abono-retiro">
                     <label for="abono-retiro" style="display: inline;">RETIRAR</label>
+                    <input type="checkbox" id="abono-retiro-manana">
+                    <label for="abono-retiro-manana" style="display: inline;">MAÑANA</label>
                 </div>
-                <label style="margin-top: 10px;">Otros:</label>
-                <input type="text" id="abono-otros">
             </div>
             <div class="center">
                 <button class="btn btn-back" onclick="volverAOperaciones()">← Atrás</button>
@@ -682,6 +682,8 @@
                 <div class="checkbox-group">
                     <input type="checkbox" id="pedir_sin_pagar-retiro">
                     <label for="pedir_sin_pagar-retiro" style="display: inline;">RETIRAR</label>
+                    <input type="checkbox" id="pedir_sin_pagar-retiro-manana">
+                    <label for="pedir_sin_pagar-retiro-manana" style="display: inline;">MAÑANA</label>
                 </div>
             </div>
             <div class="center">
@@ -2130,13 +2132,18 @@
                     datos["NUMERO(ABO)"] = document.getElementById('abono-numero').value.trim();
                     datos["ABONO"] = document.getElementById('abono-abono').value.trim();
                     datos["DESCUENTO(ABO)"] = document.getElementById('abono-descuento').value.trim();
-                    datos["RETIRO(ABO)"] = document.getElementById('abono-retiro').checked ? 'RETIRAR' : '';
-                    datos["OTROS"] = document.getElementById('abono-otros').value.trim();
+                    let retiroAbo = '';
+                    if (document.getElementById('abono-retiro').checked) retiroAbo = 'RETIRAR';
+                    if (document.getElementById('abono-retiro-manana').checked) retiroAbo = retiroAbo ? retiroAbo + ', MAÑANA' : 'MAÑANA';
+                    datos["RETIRO(ABO)"] = retiroAbo;
                     break;
                     
                 case 'pedir_sin_pagar':
                     datos["numero"] = document.getElementById('pedir_sin_pagar-numero').value.trim();
-                    datos["RETIRO(PEDIR)"] = document.getElementById('pedir_sin_pagar-retiro').checked ? 'RETIRAR' : '';
+                    let retiroPedir = '';
+                    if (document.getElementById('pedir_sin_pagar-retiro').checked) retiroPedir = 'RETIRAR';
+                    if (document.getElementById('pedir_sin_pagar-retiro-manana').checked) retiroPedir = retiroPedir ? retiroPedir + ', MAÑANA' : 'MAÑANA';
+                    datos["RETIRO(PEDIR)"] = retiroPedir;
                     break;
                     
                 case 'intereses':
@@ -2741,27 +2748,9 @@
                 configurarEnterEnUltimoCampo('ingreso', 'ingreso-cedula', 'btn-enviar-ingreso');
             }, 100);
             
-            // ABONO - último campo: otros
+            // ABONO - último campo: descuento
             setTimeout(() => {
-                const campoOtros = document.getElementById('abono-otros');
-                if (campoOtros) {
-                    const esMovil = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
-                                   (window.innerWidth <= 768);
-                    if (esMovil) {
-                        campoOtros.addEventListener('keydown', function(e) {
-                            if (e.key === 'Enter' || e.keyCode === 13) {
-                                e.preventDefault();
-                                const btn = document.getElementById('btn-enviar-abono');
-                                if (btn && !btn.disabled) {
-                                    enviarDatos('abono');
-                                }
-                            }
-                        });
-                    }
-                } else {
-                    // Si no hay campo otros, el último es descuento
-                    configurarEnterEnUltimoCampo('abono', 'abono-descuento', 'btn-enviar-abono');
-                }
+                configurarEnterEnUltimoCampo('abono', 'abono-descuento', 'btn-enviar-abono');
             }, 100);
             
             // INTERESES - último campo: intereses
