@@ -321,12 +321,27 @@
             margin: 20px 0;
         }
         
+        .success-message p,
+        .success-message h2 {
+            color: white !important;
+            visibility: visible !important;
+            display: block !important;
+        }
+        
         .error-message {
             background: #f44336;
             color: white;
-            padding: 15px;
+            padding: 20px;
             border-radius: 4px;
+            text-align: center;
             margin: 20px 0;
+        }
+        
+        .error-message p,
+        .error-message h2 {
+            color: white !important;
+            visibility: visible !important;
+            display: block !important;
         }
         
         .search-results {
@@ -1070,24 +1085,27 @@
         
         <!-- Mensajes -->
         <div id="mensaje-exito" class="hidden success-message">
-            <h2>✅ ENVIADO EXITOSAMENTE</h2>
-            <p>Los datos se han enviado correctamente a n8n</p>
-            <p style="margin-top: 15px; font-size: 14px; color: #666;">Regresando a inicio automáticamente...</p>
+            <h2 id="mensaje-exito-titulo">✅ ENVIADO EXITOSAMENTE</h2>
+            <p id="mensaje-exito-texto" style="font-size: 16px; margin: 15px 0; font-weight: 500;">Los datos se han enviado correctamente a n8n</p>
+            <p id="mensaje-exito-regreso" style="margin-top: 15px; font-size: 14px; color: rgba(255,255,255,0.8);">Regresando a inicio automáticamente...</p>
+            <div id="mensaje-exito-boton-container" style="margin-top: 20px; display: none;">
+                <button class="btn btn-primary" onclick="volverAInicio()" style="width: 150px;">INICIO</button>
+            </div>
         </div>
         
         <div id="mensaje-error" class="hidden error-message"></div>
     </div>
     
     <script>
-        // URL de producción
+        // URL de producción para el resto de operaciones
         const N8N_WEBHOOK_URL = "https://n8n.srv1191353.hstgr.cloud/webhook/INVENTARIO";
-        // URL de espera webhook para BUSCAR y CAJA (BASE y CIERRE)
+        // URL de espera webhook para INGRESO, BUSCAR y CAJA (BASE y CIERRE)
         const N8N_WEBHOOK_URL_ESPERA = "https://n8n.srv1191353.hstgr.cloud/webhook/esperawebhook";
         
         // Función helper para determinar qué URL usar según el tipo de operación
         function obtenerUrlWebhook(tipo) {
-            // BUSCAR y CAJA (BASE y CIERRE) usan la URL de espera
-            if (tipo === 'busqueda' || tipo === 'caja_base' || tipo === 'caja_cierre') {
+            // BUSCAR, CAJA (BASE y CIERRE) e INGRESO usan la URL de espera
+            if (tipo === 'busqueda' || tipo === 'caja_base' || tipo === 'caja_cierre' || tipo === 'ingreso') {
                 return N8N_WEBHOOK_URL_ESPERA;
             }
             // Todas las demás operaciones usan la URL de producción
@@ -2338,12 +2356,28 @@
                 // Usar la URL apropiada según el tipo de operación
                 const urlWebhook = obtenerUrlWebhook(tipo);
                 
-                const response = await fetch(`${urlWebhook}?${params}`, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json'
+                // INGRESO siempre debe esperar respuesta para mostrar el mensaje con colores
+                const necesitaRespuestaIngreso = tipo === 'ingreso';
+                
+                // Método normal con CORS - en producción ambas URLs deben tener CORS configurado correctamente
+                let response;
+                try {
+                    response = await fetch(`${urlWebhook}?${params}`, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+                } catch (fetchError) {
+                    // Si hay error de red o CORS, mostrar error y habilitar botón
+                    console.error('Error al enviar datos:', fetchError);
+                    mostrarError('Error de conexión. Verifique su conexión a internet y vuelva a intentar.');
+                    if (btnEnviar) {
+                        btnEnviar.disabled = false;
+                        btnEnviar.textContent = 'Enviar';
                     }
-                });
+                    return;
+                }
                 
                 if (response.ok) {
                     // Siempre leer la respuesta completa para que n8n reconozca el nodo "Respond to Webhook"
@@ -2354,6 +2388,11 @@
                         if (necesitaRespuesta) {
                             // Para CAJA CIERRE: usar los datos de la respuesta para mostrar resultados
                             mostrarResultadosCierre(respuesta);
+                        } else if (necesitaRespuestaIngreso) {
+                            // Para INGRESO: mostrar mensaje con colores según la respuesta
+                            // Pasar directamente la respuesta (puede ser array, objeto o string)
+                            // N8N "All Incoming Items" puede devolver diferentes formatos
+                            mostrarMensajeConRespuesta(respuesta, true);
                         } else {
                             // Para todas las demás operaciones: mostrar éxito (los datos se enviaron correctamente)
                             mostrarMensajeExito();
@@ -2362,22 +2401,35 @@
                         // Si no es JSON, leer como texto para consumir la respuesta
                         // Esto es necesario para que n8n reconozca que se usó el nodo "Respond to Webhook"
                         try {
-                            await response.text();
+                            const respuestaTexto = await response.text();
+                            if (necesitaRespuestaIngreso && respuestaTexto) {
+                                // Para INGRESO: intentar parsear como JSON, si no, usar como texto
+                                try {
+                                    const respuestaParseada = JSON.parse(respuestaTexto);
+                                    mostrarMensajeConRespuesta(respuestaParseada, true);
+                                } catch (e) {
+                                    // Si no es JSON válido, usar como texto
+                                    mostrarMensajeConRespuesta(respuestaTexto, true);
+                                }
+                            } else if (necesitaRespuesta) {
+                                // Si necesitábamos la respuesta pero no es JSON válido, mostrar error
+                                mostrarError('La respuesta del servidor no está en formato JSON válido.');
+                                if (btnEnviar) {
+                                    btnEnviar.disabled = false;
+                                    btnEnviar.textContent = 'Enviar';
+                                }
+                            } else {
+                                // Para operaciones normales, mostrar éxito aunque la respuesta no sea JSON
+                                // Lo importante es que se leyó la respuesta para que n8n no se queje
+                                mostrarMensajeExito();
+                            }
                         } catch (textError) {
                             // Si no se puede leer, continuar de todas formas
-                        }
-                        
-                        if (necesitaRespuesta) {
-                            // Si necesitábamos la respuesta pero no es JSON válido, mostrar error
-                            mostrarError('La respuesta del servidor no está en formato JSON válido.');
-                            if (btnEnviar) {
-                                btnEnviar.disabled = false;
-                                btnEnviar.textContent = 'Enviar';
+                            if (necesitaRespuestaIngreso) {
+                                mostrarMensajeConRespuesta('No se pudo leer la respuesta del servidor');
+                            } else if (!necesitaRespuesta) {
+                                mostrarMensajeExito();
                             }
-                        } else {
-                            // Para operaciones normales, mostrar éxito aunque la respuesta no sea JSON
-                            // Lo importante es que se leyó la respuesta para que n8n no se queje
-                            mostrarMensajeExito();
                         }
                     }
                 } else {
@@ -2792,11 +2844,180 @@
         
         // Mensajes
         function mostrarMensajeExito() {
+            // Restablecer estilos por defecto (verde)
+            const mensajeExito = document.getElementById('mensaje-exito');
+            const regreso = document.getElementById('mensaje-exito-regreso');
+            const botonContainer = document.getElementById('mensaje-exito-boton-container');
+            
+            mensajeExito.className = 'success-message';
+            document.getElementById('mensaje-exito-titulo').textContent = '✅ ENVIADO EXITOSAMENTE';
+            document.getElementById('mensaje-exito-texto').textContent = 'Los datos se han enviado correctamente a n8n';
+            
+            // Ocultar botón y mostrar regreso automático
+            botonContainer.style.display = 'none';
+            regreso.style.display = 'block';
+            
             mostrarPantalla('mensaje-exito');
             // Regresar automáticamente a inicio después de 2 segundos
             setTimeout(() => {
                 volverAInicio();
             }, 2000);
+        }
+        
+        function mostrarMensajeConRespuesta(respuesta, esIngreso = false) {
+            const mensajeExito = document.getElementById('mensaje-exito');
+            const titulo = document.getElementById('mensaje-exito-titulo');
+            const texto = document.getElementById('mensaje-exito-texto');
+            const regreso = document.getElementById('mensaje-exito-regreso');
+            const botonContainer = document.getElementById('mensaje-exito-boton-container');
+            
+            // Extraer el mensaje del formato JSON
+            let mensaje = '';
+            
+            // Si es string, intentar parsear como JSON primero
+            if (typeof respuesta === 'string') {
+                try {
+                    const parsed = JSON.parse(respuesta);
+                    respuesta = parsed;
+                } catch (e) {
+                    // Si no es JSON válido, usar como texto
+                    mensaje = respuesta.trim();
+                }
+            }
+            
+            // Si ya tenemos mensaje, saltar a la comparación
+            if (!mensaje) {
+                // Manejar diferentes formatos de respuesta de N8N "All Incoming Items"
+                if (Array.isArray(respuesta) && respuesta.length > 0) {
+                    // Formato: [{"mensaje": "..."}] o [{"json": {"mensaje": "..."}}]
+                    const primerItem = respuesta[0];
+                    
+                    // Buscar mensaje en diferentes ubicaciones posibles
+                    if (primerItem.mensaje) {
+                        mensaje = primerItem.mensaje;
+                    } else if (primerItem.message) {
+                        mensaje = primerItem.message;
+                    } else if (primerItem.json && primerItem.json.mensaje) {
+                        mensaje = primerItem.json.mensaje;
+                    } else if (primerItem.json && primerItem.json.message) {
+                        mensaje = primerItem.json.message;
+                    } else if (typeof primerItem === 'string') {
+                        mensaje = primerItem;
+                    } else {
+                        // Buscar recursivamente en el objeto
+                        const buscarMensaje = (obj) => {
+                            if (typeof obj !== 'object' || obj === null) return null;
+                            if (obj.mensaje && typeof obj.mensaje === 'string') return obj.mensaje;
+                            if (obj.message && typeof obj.message === 'string') return obj.message;
+                            for (let key in obj) {
+                                if (obj.hasOwnProperty(key)) {
+                                    const encontrado = buscarMensaje(obj[key]);
+                                    if (encontrado) return encontrado;
+                                }
+                            }
+                            return null;
+                        };
+                        const mensajeEncontrado = buscarMensaje(primerItem);
+                        mensaje = mensajeEncontrado || JSON.stringify(primerItem);
+                    }
+                } else if (respuesta && typeof respuesta === 'object') {
+                    // Formato: {"mensaje": "..."} o {"json": {"mensaje": "..."}}
+                    if (respuesta.mensaje) {
+                        mensaje = respuesta.mensaje;
+                    } else if (respuesta.message) {
+                        mensaje = respuesta.message;
+                    } else if (respuesta.json && respuesta.json.mensaje) {
+                        mensaje = respuesta.json.mensaje;
+                    } else if (respuesta.json && respuesta.json.message) {
+                        mensaje = respuesta.json.message;
+                    } else {
+                        // Buscar recursivamente
+                        const buscarMensaje = (obj) => {
+                            if (typeof obj !== 'object' || obj === null) return null;
+                            if (obj.mensaje && typeof obj.mensaje === 'string') return obj.mensaje;
+                            if (obj.message && typeof obj.message === 'string') return obj.message;
+                            for (let key in obj) {
+                                if (obj.hasOwnProperty(key)) {
+                                    const encontrado = buscarMensaje(obj[key]);
+                                    if (encontrado) return encontrado;
+                                }
+                            }
+                            return null;
+                        };
+                        const mensajeEncontrado = buscarMensaje(respuesta);
+                        mensaje = mensajeEncontrado || JSON.stringify(respuesta);
+                    }
+                } else {
+                    mensaje = String(respuesta);
+                }
+            }
+            
+            // Limpiar el mensaje (eliminar comillas, espacios extra, etc.)
+            mensaje = mensaje.trim().replace(/^["']|["']$/g, '').replace(/\\n/g, ' ').replace(/\s+/g, ' ');
+            
+            // Si el mensaje está vacío o no se pudo extraer, mostrar toda la respuesta
+            if (!mensaje || mensaje === '' || mensaje === '{}' || mensaje === '[]') {
+                mensaje = JSON.stringify(respuesta);
+            }
+            
+            // Convertir mensaje a mayúsculas para comparar
+            const mensajeUpper = mensaje.toUpperCase();
+            
+            // Determinar color según el mensaje
+            if (mensajeUpper.includes('INGRESADO CORRECTAMENTE')) {
+                // Verde (éxito)
+                mensajeExito.className = 'success-message';
+                titulo.textContent = '✅ INGRESADO CORRECTAMENTE';
+            } else if (mensajeUpper.includes('EL NUMERO DE ARTICULO YA ESTA INGRESADO') || 
+                       mensajeUpper.includes('NUMERO DE ARTICULO YA ESTA') ||
+                       mensajeUpper.includes('YA ESTA INGRESADO') ||
+                       mensajeUpper.includes('ARTICULO YA ESTA')) {
+                // Rojo (error)
+                mensajeExito.className = 'error-message';
+                titulo.textContent = '❌ ERROR';
+            } else {
+                // Por defecto verde
+                mensajeExito.className = 'success-message';
+                titulo.textContent = '✅ RESPUESTA';
+            }
+            
+            // Asignar el mensaje al texto (siempre visible)
+            texto.textContent = mensaje;
+            texto.style.display = 'block';
+            texto.style.visibility = 'visible';
+            texto.style.opacity = '1';
+            
+            // Para INGRESO: mostrar botón en lugar de regreso automático
+            if (esIngreso) {
+                regreso.style.display = 'none';
+                regreso.style.visibility = 'hidden';
+                regreso.style.height = '0';
+                regreso.style.margin = '0';
+                regreso.style.padding = '0';
+                botonContainer.style.display = 'block';
+            } else {
+                regreso.style.display = 'block';
+                regreso.style.visibility = 'visible';
+                regreso.style.height = 'auto';
+                botonContainer.style.display = 'none';
+                // Regresar automáticamente a inicio después de 3 segundos
+                setTimeout(() => {
+                    volverAInicio();
+                }, 3000);
+            }
+            
+            // Mostrar la pantalla primero
+            mostrarPantalla('mensaje-exito');
+            
+            // Asegurar que el texto se muestre después de mostrar la pantalla
+            setTimeout(() => {
+                texto.textContent = mensaje; // Forzar actualización
+                // Asegurar que el regreso esté oculto para INGRESO
+                if (esIngreso && regreso) {
+                    regreso.style.display = 'none';
+                    regreso.style.visibility = 'hidden';
+                }
+            }, 10);
         }
         
         function mostrarError(mensaje) {
