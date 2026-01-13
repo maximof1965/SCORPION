@@ -374,6 +374,232 @@
             font-family: 'Cinzel', serif;
         }
         
+        /* Estilos para tabla tipo Excel - VERIFICAR */
+        .tabla-verificar {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Courier Prime', monospace;
+            font-size: 12px;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .tabla-verificar thead {
+            background: #4472C4;
+            color: white;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .tabla-verificar th {
+            padding: 10px 8px;
+            text-align: left;
+            border: 1px solid #b4c7e7;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        
+        .tabla-verificar tbody tr {
+            background: white;
+        }
+        
+        .tabla-verificar tbody tr:nth-child(even) {
+            background: #f2f2f2;
+        }
+        
+        .tabla-verificar tbody tr:hover {
+            background: #d9e1f2;
+        }
+        
+        .tabla-verificar td {
+            padding: 8px;
+            border: 1px solid #d0cece;
+            text-align: left;
+        }
+        
+        .tabla-verificar td:first-child,
+        .tabla-verificar th:first-child {
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        /* Encabezado de tabla EXISTENTES */
+        .encabezado-tabla-verificar {
+            background: #4472C4;
+            color: white;
+            padding: 12px 15px;
+            border: 1px solid #b4c7e7;
+            border-bottom: none;
+            border-radius: 4px 4px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Courier Prime', monospace;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        
+        .encabezado-tabla-verificar .titulo {
+            font-weight: 700;
+        }
+        
+        .encabezado-tabla-verificar .total {
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 12px;
+            border-radius: 4px;
+        }
+        
+        /* Espaciado entre tablas */
+        .tabla-verificar-wrapper {
+            margin-bottom: 30px;
+        }
+        
+        /* Contenedor de resultados optimizado */
+        #resultados-verificar-container {
+            margin: 20px 0;
+            overflow-x: auto;
+            max-height: 70vh;
+            overflow-y: auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
+        }
+        
+        /* Responsive para móviles */
+        @media (max-width: 768px) {
+            .tabla-verificar {
+                font-size: 10px;
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .tabla-verificar thead {
+                display: block;
+            }
+            
+            .tabla-verificar tbody {
+                display: block;
+            }
+            
+            .tabla-verificar th,
+            .tabla-verificar td {
+                padding: 6px 4px;
+                min-width: 60px;
+                max-width: 120px;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+            }
+            
+            .tabla-verificar th {
+                white-space: nowrap;
+                font-size: 9px;
+            }
+            
+            .tabla-verificar td {
+                font-size: 9px;
+            }
+            
+            .encabezado-tabla-verificar {
+                padding: 10px 12px;
+                font-size: 12px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .encabezado-tabla-verificar .total {
+                align-self: flex-end;
+                font-size: 11px;
+                padding: 3px 10px;
+            }
+            
+            .tabla-verificar-wrapper {
+                margin-bottom: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .tabla-verificar {
+                font-size: 8px;
+            }
+            
+            .tabla-verificar th,
+            .tabla-verificar td {
+                padding: 4px 2px;
+                min-width: 50px;
+                max-width: 100px;
+            }
+            
+            .tabla-verificar th {
+                white-space: normal;
+                word-break: break-word;
+                font-size: 8px;
+                line-height: 1.2;
+            }
+            
+            .tabla-verificar td {
+                font-size: 8px;
+                line-height: 1.3;
+            }
+            
+            .encabezado-tabla-verificar {
+                padding: 8px 10px;
+                font-size: 11px;
+            }
+            
+            .encabezado-tabla-verificar .titulo {
+                font-size: 11px;
+            }
+            
+            .encabezado-tabla-verificar .total {
+                font-size: 10px;
+                padding: 2px 8px;
+            }
+            
+            #resultados-verificar-container {
+                padding: 5px;
+                margin: 15px 0;
+                max-height: 65vh;
+            }
+            
+            .tabla-verificar-wrapper {
+                margin-bottom: 15px;
+            }
+        }
+        
+        /* Optimización adicional para pantallas muy pequeñas */
+        @media (max-width: 360px) {
+            .tabla-verificar {
+                font-size: 7px;
+            }
+            
+            .tabla-verificar th,
+            .tabla-verificar td {
+                padding: 3px 1px;
+                min-width: 40px;
+                max-width: 80px;
+            }
+            
+            .encabezado-tabla-verificar {
+                padding: 6px 8px;
+                font-size: 10px;
+            }
+            
+            .encabezado-tabla-verificar .titulo {
+                font-size: 10px;
+            }
+            
+            .encabezado-tabla-verificar .total {
+                font-size: 9px;
+                padding: 2px 6px;
+            }
+        }
+        }
+        
         .result-value:empty::before {
             content: "(vacío)";
             color: #999;
@@ -534,6 +760,7 @@
                 <button class="btn btn-secondary" onclick="mostrarCajaBaseCierre()" style="width: 200px;">CAJA</button>
                 <button class="btn btn-secondary" onclick="mostrarControl()" style="width: 200px;">CONTROL</button>
                 <button class="btn btn-secondary" onclick="mostrarTurnoGastos()" style="width: 200px;">GASTOS</button>
+                <button class="btn btn-secondary" onclick="mostrarFechaVerificar()" style="width: 200px;">VERIFICAR</button>
             </div>
         </div>
         
@@ -746,6 +973,20 @@
             </div>
         </div>
         
+        <!-- Pantalla para ingresar FECHA antes de VERIFICAR -->
+        <div id="screen-fecha-verificar" class="hidden">
+            <h1>VERIFICAR</h1>
+            <div class="subtitle center">Ingrese la fecha:</div>
+            <div class="form-group">
+                <label>FECHA *</label>
+                <input type="tel" id="verificar-fecha" placeholder="DD/MM/YY (ej: 25/12/24)" maxlength="10" inputmode="numeric" autocomplete="off" oninput="formatearFechaVerificar(this)" onkeypress="if(event.key==='Enter' && !document.getElementById('btn-continuar-verificar').disabled) continuarVerificar()">
+            </div>
+            <div class="center" style="margin-top: 20px;">
+                <button class="btn btn-back" onclick="volverAInicio()">← Volver al Inicio</button>
+                <button class="btn btn-primary" id="btn-continuar-verificar" onclick="continuarVerificar()" disabled>Continuar</button>
+            </div>
+        </div>
+        
         <!-- Formulario BUSQUEDA -->
         <div id="form-busqueda" class="hidden">
             <h1>BUSQUEDA</h1>
@@ -808,6 +1049,15 @@
                 <button class="btn btn-turno" onclick="seleccionarTurnoDesdeResultados('1')">TURNO 1</button>
                 <button class="btn btn-turno" onclick="seleccionarTurnoDesdeResultados('2')">TURNO 2</button>
                 <button class="btn btn-turno" onclick="seleccionarTurnoDesdeResultados('3')">TURNO 3</button>
+            </div>
+        </div>
+        
+        <!-- Resultados de VERIFICAR -->
+        <div id="screen-resultados-verificar" class="hidden">
+            <h1>VERIFICAR</h1>
+            <div id="resultados-verificar-container" style="margin: 20px 0; overflow-x: auto; max-height: 70vh; overflow-y: auto; box-shadow: 0 2px 10px rgba(0,0,0,0.1);"></div>
+            <div class="center" style="margin-top: 20px;">
+                <button class="btn btn-back" onclick="volverAInicio()">VOLVER A INICIO</button>
             </div>
         </div>
         
@@ -2456,6 +2706,451 @@
                     btnEnviar.textContent = 'Enviar';
                 }
             }
+        }
+        
+        // Función para mostrar pantalla de fecha antes de VERIFICAR
+        function mostrarFechaVerificar() {
+            mostrarPantalla('screen-fecha-verificar');
+            const inputFecha = document.getElementById('verificar-fecha');
+            if (inputFecha) {
+                // Limpiar campo
+                inputFecha.value = '';
+                inputFecha.style.borderColor = '';
+                // Enfocar y seleccionar campo después de un pequeño delay
+                setTimeout(() => {
+                    inputFecha.focus();
+                    inputFecha.select();
+                }, 150);
+            }
+            // Deshabilitar botón inicialmente
+            const btnContinuar = document.getElementById('btn-continuar-verificar');
+            if (btnContinuar) {
+                btnContinuar.disabled = true;
+                btnContinuar.textContent = 'Continuar';
+            }
+        }
+        
+        // Función para formatear fecha mientras se escribe (DD/MM/YY)
+        function formatearFechaVerificar(input) {
+            console.log('formatearFechaVerificar llamada, valor actual:', input.value);
+            
+            // Guardar posición del cursor
+            let cursorPos = input.selectionStart;
+            let valorOriginal = input.value;
+            
+            // Obtener solo números
+            let valor = input.value.replace(/\D/g, '');
+            console.log('Valor solo números:', valor);
+            
+            // Limitar a 6 dígitos (DDMMYY)
+            if (valor.length > 6) {
+                valor = valor.substring(0, 6);
+            }
+            
+            // Agregar barras automáticamente en las posiciones correctas
+            let valorFormateado = '';
+            if (valor.length >= 1) {
+                valorFormateado = valor.substring(0, 2);
+                if (valor.length > 2) {
+                    valorFormateado += '/' + valor.substring(2, 4);
+                    if (valor.length > 4) {
+                        valorFormateado += '/' + valor.substring(4, 6);
+                    }
+                }
+            }
+            
+            console.log('Valor formateado:', valorFormateado);
+            
+            // Actualizar el valor
+            input.value = valorFormateado;
+            
+            // Ajustar posición del cursor
+            if (valorFormateado.length > valorOriginal.length) {
+                cursorPos += valorFormateado.length - valorOriginal.length;
+            }
+            input.setSelectionRange(cursorPos, cursorPos);
+            
+            // Validar
+            validarFechaVerificar();
+        }
+        
+        // Validar formato de fecha DD/MM/YY
+        function validarFechaVerificar() {
+            const inputFecha = document.getElementById('verificar-fecha');
+            const btnContinuar = document.getElementById('btn-continuar-verificar');
+            if (!inputFecha || !btnContinuar) return false;
+            
+            let fecha = inputFecha.value.trim();
+            console.log('validarFechaVerificar - fecha recibida:', fecha);
+            
+            // Si no tiene slashes pero tiene 6 dígitos, formatearla primero
+            if (!fecha.includes('/') && fecha.replace(/\D/g, '').length === 6) {
+                const soloNumeros = fecha.replace(/\D/g, '');
+                fecha = soloNumeros.substring(0, 2) + '/' + 
+                       soloNumeros.substring(2, 4) + '/' + 
+                       soloNumeros.substring(4, 6);
+                inputFecha.value = fecha;
+                console.log('Fecha formateada automáticamente:', fecha);
+            }
+            
+            // Validar formato DD/MM/YY
+            const formatoFecha = /^(\d{2})\/(\d{2})\/(\d{2})$/;
+            if (formatoFecha.test(fecha)) {
+                const partes = fecha.split('/');
+                const dia = parseInt(partes[0], 10);
+                const mes = parseInt(partes[1], 10);
+                const anio = parseInt(partes[2], 10);
+                
+                console.log('Partes de fecha:', dia, mes, anio);
+                
+                // Validar rangos básicos
+                if (dia >= 1 && dia <= 31 && mes >= 1 && mes <= 12 && anio >= 0 && anio <= 99) {
+                    inputFecha.style.borderColor = '#4CAF50';
+                    btnContinuar.disabled = false;
+                    console.log('Fecha válida, botón habilitado');
+                    return true;
+                } else {
+                    console.log('Fecha fuera de rango válido');
+                }
+            } else {
+                console.log('Fecha no coincide con formato DD/MM/YY');
+            }
+            
+            inputFecha.style.borderColor = '#f44336';
+            btnContinuar.disabled = true;
+            return false;
+        }
+        
+        // Continuar con VERIFICAR después de ingresar la fecha
+        function continuarVerificar() {
+            console.log('continuarVerificar llamada');
+            const inputFecha = document.getElementById('verificar-fecha');
+            if (!inputFecha) {
+                console.error('No se encontró el campo de fecha');
+                return;
+            }
+            
+            const fecha = inputFecha.value.trim();
+            console.log('Fecha ingresada:', fecha);
+            
+            if (!validarFechaVerificar()) {
+                alert('Por favor ingrese una fecha válida en formato DD/MM/YY');
+                inputFecha.focus();
+                return;
+            }
+            
+            // Deshabilitar botón mientras se envía
+            const btnContinuar = document.getElementById('btn-continuar-verificar');
+            if (btnContinuar) {
+                btnContinuar.disabled = true;
+                btnContinuar.textContent = 'Enviando...';
+            }
+            
+            console.log('Llamando a enviarVerificar con fecha:', fecha);
+            // Enviar con la fecha ingresada
+            enviarVerificar(fecha);
+        }
+        
+        // Función para enviar VERIFICAR
+        async function enviarVerificar(fechaIngresada) {
+            console.log('enviarVerificar llamada con:', fechaIngresada);
+            try {
+                // Asegurar que la fecha tenga el formato correcto
+                let fechaFinal = fechaIngresada || obtenerMarcaTemporal();
+                
+                // Si la fecha no tiene formato DD/MM/YY, intentar formatearla
+                if (fechaIngresada && !fechaIngresada.includes('/')) {
+                    // Si viene como 120126, convertir a 12/01/26
+                    const soloNumeros = fechaIngresada.replace(/\D/g, '');
+                    if (soloNumeros.length === 6) {
+                        fechaFinal = soloNumeros.substring(0, 2) + '/' + 
+                                   soloNumeros.substring(2, 4) + '/' + 
+                                   soloNumeros.substring(4, 6);
+                    }
+                }
+                
+                const datos = {
+                    tipo: 'VERIFICAR',
+                    "Marca temporal": fechaFinal
+                };
+                
+                console.log('Enviando datos a N8N:', datos);
+                
+                const params = new URLSearchParams(datos);
+                const urlWebhook = "https://n8n.srv1191353.hstgr.cloud/webhook/esperawebhook";
+                const urlCompleta = `${urlWebhook}?${params}`;
+                
+                console.log('URL completa:', urlCompleta);
+                
+                const response = await fetch(urlCompleta, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                console.log('Respuesta recibida - Status:', response.status, 'StatusText:', response.statusText);
+                console.log('Response OK:', response.ok);
+                
+                if (response.ok) {
+                    try {
+                        const respuesta = await response.json();
+                        console.log('Respuesta JSON recibida:', respuesta);
+                        mostrarResultadosVerificar(respuesta);
+                    } catch (jsonError) {
+                        console.log('Error parseando JSON, leyendo como texto. Error:', jsonError);
+                        const respuestaTexto = await response.text();
+                        console.log('Respuesta como texto:', respuestaTexto);
+                        mostrarResultadosVerificar(respuestaTexto);
+                    }
+                } else {
+                    let errorText = '';
+                    try {
+                        errorText = await response.text();
+                    } catch (e) {
+                        errorText = 'No se pudo leer el error';
+                    }
+                    console.error('Error del servidor - Status:', response.status, 'Error:', errorText);
+                    mostrarError(`Error al verificar (${response.status}). Por favor intente nuevamente.`);
+                    const btnContinuar = document.getElementById('btn-continuar-verificar');
+                    if (btnContinuar) {
+                        btnContinuar.disabled = false;
+                        btnContinuar.textContent = 'Continuar';
+                    }
+                }
+            } catch (error) {
+                console.error('EXCEPCIÓN al enviar verificar:', error);
+                console.error('Stack trace:', error.stack);
+                mostrarError(`Error de conexión: ${error.message}. Verifique su conexión a internet y vuelva a intentar.`);
+                const btnContinuar = document.getElementById('btn-continuar-verificar');
+                if (btnContinuar) {
+                    btnContinuar.disabled = false;
+                    btnContinuar.textContent = 'Continuar';
+                }
+            }
+        }
+        
+        // Función para crear una tabla desde un array de datos
+        function crearTablaVerificar(datosArray, titulo, columnasEspecificas) {
+            if (!datosArray || datosArray.length === 0) {
+                console.log(`crearTablaVerificar: No hay datos para "${titulo}"`);
+                return '';
+            }
+            
+            console.log(`=== crearTablaVerificar para "${titulo}" ===`);
+            console.log(`Total registros: ${datosArray.length}`);
+            console.log(`Primer registro:`, datosArray[0]);
+            if (datosArray[0] && datosArray[0].grupo) {
+                console.log(`Grupo del primer registro: "${datosArray[0].grupo}"`);
+            }
+            
+            // Usar las columnas específicas proporcionadas
+            const columnasFiltradas = columnasEspecificas || [];
+            
+            console.log(`Columnas para "${titulo}":`, columnasFiltradas);
+            
+            // Calcular total de artículos
+            const totalArticulos = datosArray.length;
+            
+            // Crear HTML de la tabla
+            let tablaHTML = '<div class="tabla-verificar-wrapper">';
+            
+            // Encabezado de la tabla con título y total
+            tablaHTML += '<div class="encabezado-tabla-verificar">';
+            tablaHTML += `<span class="titulo">${titulo}</span>`;
+            tablaHTML += `<span class="total">Total: ${totalArticulos} artículos</span>`;
+            tablaHTML += '</div>';
+            
+            // Tabla
+            tablaHTML += '<table class="tabla-verificar"><thead><tr>';
+            
+            // Crear encabezados de columnas
+            columnasFiltradas.forEach(col => {
+                tablaHTML += `<th>${col}</th>`;
+            });
+            tablaHTML += '</tr></thead><tbody>';
+            
+            // Crear filas de datos - SOLO los datos del array recibido
+            let registrosCorrectos = 0;
+            let registrosIncorrectos = 0;
+            
+            datosArray.forEach((fila, indexFila) => {
+                // Verificar que este registro pertenece al grupo correcto (doble verificación STRICT)
+                if (fila.grupo) {
+                    const grupoFila = String(fila.grupo).trim().toUpperCase();
+                    if (titulo === 'EXISTENTES' && grupoFila !== 'GRUPO 1') {
+                        console.error(`❌ ERROR: Registro ${indexFila} en tabla EXISTENTES tiene grupo "${fila.grupo}" (esperado: GRUPO 1)`);
+                        console.error(`   NUMERO: ${fila.NUMERO}, FECHA: ${fila.FECHA || fila['FECHA SALIDA']}`);
+                        registrosIncorrectos++;
+                        return; // Saltar este registro
+                    }
+                    if (titulo === 'LIQUIDADOS' && grupoFila !== 'GRUPO 2') {
+                        console.error(`❌ ERROR: Registro ${indexFila} en tabla LIQUIDADOS tiene grupo "${fila.grupo}" (esperado: GRUPO 2)`);
+                        console.error(`   NUMERO: ${fila.NUMERO}, FECHA: ${fila.FECHA || fila['FECHA SALIDA']}`);
+                        registrosIncorrectos++;
+                        return; // Saltar este registro
+                    }
+                } else {
+                    console.error(`❌ ERROR: Registro ${indexFila} en tabla "${titulo}" no tiene campo 'grupo'`);
+                    registrosIncorrectos++;
+                    return; // Saltar este registro
+                }
+                
+                registrosCorrectos++;
+                tablaHTML += '<tr>';
+                columnasFiltradas.forEach(col => {
+                    const valor = fila[col] !== undefined && fila[col] !== null ? fila[col] : '';
+                    tablaHTML += `<td>${valor}</td>`;
+                });
+                tablaHTML += '</tr>';
+            });
+            
+            console.log(`Tabla "${titulo}": ${registrosCorrectos} registros correctos, ${registrosIncorrectos} registros incorrectos (omitidos)`);
+            
+            tablaHTML += '</tbody></table></div>';
+            return tablaHTML;
+        }
+        
+        // Función para mostrar resultados de VERIFICAR
+        function mostrarResultadosVerificar(datos) {
+            console.log('Datos recibidos de VERIFICAR:', datos);
+            
+            // Normalizar datos: si viene en formato de N8N "All Incoming Items"
+            let datosArray = [];
+            if (Array.isArray(datos)) {
+                datosArray = datos;
+            } else if (datos && typeof datos === 'object') {
+                // Si es un objeto con array dentro
+                if (datos.json && Array.isArray(datos.json)) {
+                    datosArray = datos.json;
+                } else if (datos[0] && Array.isArray(datos[0])) {
+                    datosArray = datos[0];
+                } else {
+                    // Si es un solo objeto, convertir a array
+                    datosArray = [datos];
+                }
+            } else if (typeof datos === 'string') {
+                try {
+                    const parsed = JSON.parse(datos);
+                    datosArray = Array.isArray(parsed) ? parsed : [parsed];
+                } catch (e) {
+                    mostrarError('Error al procesar los datos recibidos.');
+                    return;
+                }
+            }
+            
+            if (datosArray.length === 0) {
+                mostrarError('No se recibieron datos para mostrar.');
+                return;
+            }
+            
+            // Separar datos por grupo (ENTRADA 1 y ENTRADA 2) - STRICT FILTERING
+            const entrada1 = [];
+            const entrada2 = [];
+            
+            datosArray.forEach((item, index) => {
+                // Obtener el valor del campo grupo
+                const grupoValue = item.grupo;
+                
+                // Verificar que el grupo existe y tiene el valor correcto
+                if (!grupoValue) {
+                    console.warn(`Registro ${index} sin campo 'grupo':`, item);
+                    return; // Saltar este registro
+                }
+                
+                const grupoStr = String(grupoValue).trim();
+                const grupoUpper = grupoStr.toUpperCase();
+                
+                // Log para los primeros 5 registros para debug
+                if (index < 5) {
+                    console.log(`Registro ${index}: grupo="${grupoStr}" (normalizado: "${grupoUpper}")`);
+                    console.log(`  - NUMERO: ${item.NUMERO}, FECHA: ${item.FECHA || item['FECHA SALIDA'] || 'N/A'}`);
+                }
+                
+                // CREAR COPIA PROFUNDA del objeto antes de agregarlo (evitar referencias compartidas)
+                const itemCopia = JSON.parse(JSON.stringify(item));
+                
+                // Filtrar STRICT por grupo - "GRUPO 1" → EXISTENTES, "GRUPO 2" → LIQUIDADOS
+                if (grupoUpper === 'GRUPO 1') {
+                    entrada1.push(itemCopia);
+                } else if (grupoUpper === 'GRUPO 2') {
+                    entrada2.push(itemCopia);
+                } else {
+                    console.warn(`Registro ${index} con grupo inválido: "${grupoStr}" (esperado: GRUPO 1 o GRUPO 2)`, item);
+                }
+            });
+            
+            console.log('=== SEPARACIÓN DE DATOS ===');
+            console.log('Total datos recibidos:', datosArray.length);
+            console.log('ENTRADA 1 (EXISTENTES):', entrada1.length, 'registros');
+            console.log('ENTRADA 2 (LIQUIDADOS):', entrada2.length, 'registros');
+            
+            // Verificar que los datos están correctamente separados
+            if (entrada1.length > 0) {
+                console.log('Primer registro ENTRADA 1:', entrada1[0]);
+                console.log('Grupo del primer registro ENTRADA 1:', entrada1[0].grupo);
+                console.log('NUMERO del primer registro ENTRADA 1:', entrada1[0].NUMERO);
+            }
+            if (entrada2.length > 0) {
+                console.log('Primer registro ENTRADA 2:', entrada2[0]);
+                console.log('Grupo del primer registro ENTRADA 2:', entrada2[0].grupo);
+                console.log('NUMERO del primer registro ENTRADA 2:', entrada2[0].NUMERO);
+            }
+            
+            // Verificación adicional: verificar que no hay duplicados por NUMERO
+            const numerosEntrada1 = entrada1.map(item => item.NUMERO).filter(n => n !== undefined && n !== null);
+            const numerosEntrada2 = entrada2.map(item => item.NUMERO).filter(n => n !== undefined && n !== null);
+            const duplicados = numerosEntrada1.filter(num => numerosEntrada2.includes(num));
+            if (duplicados.length > 0) {
+                console.error('⚠️ ERROR: Se encontraron números duplicados entre ENTRADA 1 y ENTRADA 2:', duplicados.slice(0, 10));
+                console.error('Esto significa que los mismos registros están en ambos grupos');
+            } else {
+                console.log('✓ Verificación: No hay números duplicados entre los grupos');
+            }
+            
+            // Definir columnas específicas para cada tabla
+            const columnasExistentes = ['FECHA', 'OPER', 'NUMERO', 'VR PR', 'VR RT', 'NOMBRE'];
+            const columnasLiquidados = ['FECHA SALIDA', 'OPER', 'NUMERO', 'VR AB', 'DES'];
+            
+            // Crear la tabla HTML
+            const container = document.getElementById('resultados-verificar-container');
+            let htmlCompleto = '';
+            
+            // Tabla EXISTENTES (ENTRADA 1) - SOLO datos de ENTRADA 1 con columnas específicas
+            if (entrada1.length > 0) {
+                console.log('=== CREANDO TABLA EXISTENTES ===');
+                console.log('Registros para EXISTENTES:', entrada1.length);
+                console.log('Verificando primer registro:', entrada1[0]);
+                console.log('Grupo del primer registro:', entrada1[0].grupo);
+                // Crear copia profunda del array para asegurar que no se modifique
+                const datosExistentes = JSON.parse(JSON.stringify(entrada1));
+                htmlCompleto += crearTablaVerificar(datosExistentes, 'EXISTENTES', columnasExistentes);
+            } else {
+                console.log('No hay datos para tabla EXISTENTES');
+            }
+            
+            // Tabla LIQUIDADOS (ENTRADA 2) - SOLO datos de ENTRADA 2 con columnas específicas
+            if (entrada2.length > 0) {
+                console.log('=== CREANDO TABLA LIQUIDADOS ===');
+                console.log('Registros para LIQUIDADOS:', entrada2.length);
+                console.log('Verificando primer registro:', entrada2[0]);
+                console.log('Grupo del primer registro:', entrada2[0].grupo);
+                // Crear copia profunda del array para asegurar que no se modifique
+                const datosLiquidados = JSON.parse(JSON.stringify(entrada2));
+                htmlCompleto += crearTablaVerificar(datosLiquidados, 'LIQUIDADOS', columnasLiquidados);
+            } else {
+                console.log('No hay datos para tabla LIQUIDADOS');
+            }
+            
+            // Si no hay datos en ningún grupo, mostrar mensaje
+            if (htmlCompleto === '') {
+                htmlCompleto = '<p style="text-align: center; padding: 20px; color: #666;">No se encontraron datos para mostrar.</p>';
+            }
+            
+            container.innerHTML = htmlCompleto;
+            
+            // Mostrar la pantalla de resultados
+            mostrarPantalla('screen-resultados-verificar');
         }
         
         // Búsqueda inicial
