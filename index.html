@@ -732,8 +732,65 @@
         
         /* Media query para tablets */
         @media (min-width: 769px) and (max-width: 1024px) {
+            body::before {
+                background-attachment: scroll;
+                background-size: cover;
+            }
+            
             .content-wrapper {
-                padding: 20px;
+                padding: 24px;
+            }
+            
+            /* Botones página principal: más grandes y cómodos para tablet */
+            #screen-inicial .menu-inicial {
+                gap: 22px !important;
+                margin-top: 36px !important;
+            }
+            
+            #screen-inicial .btn-menu-inicial {
+                width: 320px !important;
+                min-width: 280px;
+                padding: 18px 28px;
+                font-size: 18px;
+                margin: 6px;
+            }
+            
+            #screen-inicial h1 {
+                font-size: 36px;
+                margin-bottom: 24px;
+            }
+            
+            /* Contenedor resultados de búsqueda: ocupa más pantalla */
+            #screen-resultados-busqueda #resultados-container {
+                min-height: 55vh;
+                max-height: 72vh;
+                padding: 24px;
+                margin: 24px 0;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            #screen-resultados-busqueda #resultados-container > div:first-child {
+                font-size: 16px;
+                margin-bottom: 18px;
+            }
+            
+            #screen-resultados-busqueda .result-item {
+                padding: 14px 12px;
+                font-size: 15px;
+            }
+            
+            #screen-resultados-busqueda .result-label {
+                min-width: 160px;
+                font-size: 15px;
+            }
+            
+            #screen-resultados-busqueda .result-value {
+                font-size: 15px;
+            }
+            
+            #screen-resultados-busqueda h1 {
+                font-size: 22px;
+                margin-bottom: 20px;
             }
         }
         
@@ -759,15 +816,15 @@
         <!-- Pantalla Inicial -->
         <div id="screen-inicial">
             <h1>скорпион</h1>
-            <div class="center" style="display: flex; flex-direction: column; align-items: center; gap: 15px; margin-top: 30px;">
-                <button class="btn btn-secondary" onclick="mostrarTurnoIngreso()" style="width: 200px;">INGRESO</button>
-                <button class="btn btn-secondary" onclick="mostrarBusquedaInicial()" style="width: 200px;">BUSCAR</button>
-                <button class="btn btn-secondary" onclick="mostrarTurnoBar()" style="width: 200px;">BAR</button>
-                <button class="btn btn-secondary" onclick="mostrarTurnoGuardadero()" style="width: 200px;">GUARDADERO</button>
-                <button class="btn btn-secondary" onclick="mostrarCajaBaseCierre()" style="width: 200px;">CAJA</button>
-                <button class="btn btn-secondary" onclick="mostrarControl()" style="width: 200px;">CONTROL</button>
-                <button class="btn btn-secondary" onclick="mostrarTurnoGastos()" style="width: 200px;">GASTOS</button>
-                <button class="btn btn-secondary" onclick="mostrarFechaVerificar()" style="width: 200px;">VERIFICAR</button>
+            <div class="center menu-inicial" style="display: flex; flex-direction: column; align-items: center; gap: 15px; margin-top: 30px;">
+                <button class="btn btn-secondary btn-menu-inicial" onclick="mostrarTurnoIngreso()" style="width: 200px;">INGRESO</button>
+                <button class="btn btn-secondary btn-menu-inicial" onclick="mostrarBusquedaInicial()" style="width: 200px;">BUSCAR</button>
+                <button class="btn btn-secondary btn-menu-inicial" onclick="mostrarTurnoBar()" style="width: 200px;">BAR</button>
+                <button class="btn btn-secondary btn-menu-inicial" onclick="mostrarTurnoGuardadero()" style="width: 200px;">GUARDADERO</button>
+                <button class="btn btn-secondary btn-menu-inicial" onclick="mostrarCajaBaseCierre()" style="width: 200px;">CAJA</button>
+                <button class="btn btn-secondary btn-menu-inicial" onclick="mostrarControl()" style="width: 200px;">CONTROL</button>
+                <button class="btn btn-secondary btn-menu-inicial" onclick="mostrarTurnoGastos()" style="width: 200px;">GASTOS</button>
+                <button class="btn btn-secondary btn-menu-inicial" onclick="mostrarFechaVerificar()" style="width: 200px;">VERIFICAR</button>
             </div>
         </div>
         
